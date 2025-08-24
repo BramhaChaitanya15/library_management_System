@@ -1,0 +1,75 @@
+@charset "ISO-8859-1";
+
+* {
+	margin: 0px;
+	padding: 0px;
+}
+
+a {
+	color: #000;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #000;
+	text-decoration: none;
+}
+
+body {
+	background-image: linear-gradient(rgba(0, 0, 0, .7), rgba(0, 0, 0, .7)), url("../img/background.avif");
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: 100% 100%;
+	background-color: #cccccc;
+	color: white;
+}
+
+.home-section {
+	background-image: url('library-background.jpg');
+	background-size: cover;
+	background-position: center;
+	color: #ffffff;
+	text-align: center;
+	padding: 100px 0;
+}
+
+.home-section h1 {
+	font-size: 3rem;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+
+.home-section p {
+	font-size: 1.2rem;
+}
+
+table,
+th,
+td {
+	border: 3px solid black;
+	border-collapse: collapse;
+}
+
+.form-card {
+	background: linear-gradient(rgba(255, 255, 255, .2), rgba(255, 255, 255, .2));
+	margin-top: 20px;
+	padding: 10px;
+	border: 2px solid #cccccc;
+}
+
+.invalid-feedback {
+	display: block;
+}
+
+.action-cell-unclickable {
+	pointer-events: none;
+}
+
+.action-cell-unclickable button {
+	pointer-events: auto;
+}
+
+#actual td, #search-result td, 
+#actual-user td, #search-result-user td {
+	cursor: pointer;
+}

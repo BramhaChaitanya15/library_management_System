@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" th:replace="base::layout(~{::section})">
+
+<head>
+	<meta charset="UTF-8">
+	<title>home page</title>
+
+</head>
+
+<body>
+	<section>
+		<div class="container">
+			<div class="container">
+				<div class="form-card">
+					<h2>Add User</h2>
+
+					<div th:if="${session.alert}" th:classappend="${session.alert.type}" class="alert alert-dismissible"
+						role="alert">
+						<strong class="text-center" th:text="${session.alert.content}"></strong>
+						<th:block th:text="${@sessionHelper.removeAlertFromSession()}"></th:block>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+						</button>
+					</div>
+
+					<br>
+					<form novalidate th:action="@{/process-add-user}" method="post" th:object="${user}">
+						<div class="form-group">
+							<label for="name">User Name:</label>
+							<input type="text" class="form-control" name="name"
+								th:classappend="${#fields.hasErrors('name')?'is-invalid':''}" id="name"
+								placeholder="Enter name" th:value="${user.name}" required />
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('name')}" th:text="${e}">
+						</div>
+						<div class="form-group">
+							<label for="phoneNumber">Phone Number:</label>
+							<input type="text" class="form-control" name="phoneNumber"
+								th:classappend="${#fields.hasErrors('phoneNumber')?'is-invalid':''}" id="phoneNumber"
+								placeholder="Enter Phone Number" th:value="${user.phoneNumber}" required>
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('phoneNumber')}" th:text="${e}">
+						</div>
+						<div class="form-group">
+							<label for="email">Email :</label>
+							<input type="text" class="form-control" name="email"
+								th:classappend="${#fields.hasErrors('email')?'is-invalid':''}" id="email"
+								placeholder="Enter email" th:value="${user.email}" required>
+						</div>
+						<div class="form-group">
+							<label for="subscribtionValidation">Subscribtion Validation Date :</label>
+							<input type="date" class="form-control" name="subscribtionValidation"
+								th:classappend="${#fields.hasErrors('subscribtionValidation')?'is-invalid':''}"
+								id="subscribtionValidation" th:value="${user.subscribtionValidation}" required>
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('subscribtionValidation')}"
+							th:text="${e}">
+						</div>
+						<button type="submit" class="btn btn-primary mt-2"><i class="bi bi-plus-circle-fill"></i> Add
+							User</button>
+					</form>
+
+					<a th:href="@{/user-list}" class="btn btn-secondary mt-3"><i class="bi bi-backspace-fill"></i> Back
+						to User list</a>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

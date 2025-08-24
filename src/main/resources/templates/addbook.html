@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" th:replace="base::layout(~{::section})">
+
+<head>
+	<meta charset="UTF-8">
+	<title>home page</title>
+
+</head>
+
+<body>
+	<section>
+		<div class="container">
+			<div class="container">
+				<div class="form-card">
+					<h2>Add Book</h2>
+
+					<div th:if="${session.alert}" th:classappend="${session.alert.type}" class="alert alert-dismissible"
+						role="alert">
+						<strong class="text-center" th:text="${session.alert.content}"></strong>
+						<th:block th:text="${@sessionHelper.removeAlertFromSession()}"></th:block>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+						</button>
+					</div>
+
+					<br>
+					<form novalidate th:action="@{/process-add-book}" method="post" th:object="${book}">
+						<div class="form-group">
+							<label for="bookTitle">Book Title:</label>
+							<input type="text" class="form-control" name="bookTitle"
+								th:classappend="${#fields.hasErrors('bookTitle')?'is-invalid':''}" id="bookTitle"
+								placeholder="Enter book title" th:value="${book.bookTitle}" required />
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('bookTitle')}" th:text="${e}">
+						</div>
+						<div class="form-group">
+							<label for="author">Author:</label>
+							<input type="text" class="form-control" name="author"
+								th:classappend="${#fields.hasErrors('author')?'is-invalid':''}" id="author"
+								placeholder="Enter author" th:value="${book.author}" required>
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('author')}" th:text="${e}">
+						</div>
+						<div class="form-group">
+							<label for="isbn">ISBN:</label>
+							<input type="text" class="form-control" name="isbn"
+								th:classappend="${#fields.hasErrors('isbn')?'is-invalid':''}" id="isbn"
+								placeholder="Enter ISBN" th:value="${book.isbn}" required>
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('isbn')}" th:text="${e}">
+						</div>
+						<div class="form-group">
+							<label for="isbn">Quantity:</label>
+							<input type="number" class="form-control" name="quantity"
+								th:classappend="${#fields.hasErrors('quantity')?'is-invalid':''}" id="quantity"
+								placeholder="Enter quantity" required>
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('quantity')}" th:text="${e}">
+						</div>
+						<div class="form-group">
+							<label for="isbn">Available:</label>
+							<input type="number" class="form-control" name="available"
+								th:classappend="${#fields.hasErrors('available')?'is-invalid':''}" id="available"
+								placeholder="Enter available" required>
+						</div>
+						<div class="invalid-feedback" th:each="e : ${#fields.errors('available')}" th:text="${e}">
+						</div>
+						<button type="submit" class="btn btn-primary mt-2"><i class="bi bi-plus-circle-fill"></i> Add
+							Book</button>
+					</form>
+
+					<a th:href="@{/book-list}" class="btn btn-secondary mt-3"><i class="bi bi-backspace-fill"></i> Back
+						to Books</a>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

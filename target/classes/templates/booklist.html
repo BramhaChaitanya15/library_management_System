@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" th:replace="base::layout(~{::section})">
+
+<head>
+	<meta charset="UTF-8">
+	<title>home page</title>
+
+</head>
+
+<body>
+	<section>
+		<div class="container mt-3 mb-3 p-2">
+
+			<table class="table table-dark table-hover search-result" id="search-result">
+				<!--dynamic result-->
+			</table>
+			<table class="table table-dark table-hover" id="actual">
+
+				<div th:if="${session.alert}" th:classappend="${session.alert.type}" class="alert alert-dismissible"
+					role="alert">
+					<strong class="text-center" th:text="${session.alert.content}"></strong>
+					<th:block th:text="${@sessionHelper.removeAlertFromSession()}"></th:block>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+					</button>
+				</div>
+
+				<thead class='thead-light'>
+					<tr>
+						<th class="table-success bg-success"> Sr. No. </th>
+						<th class="table-success bg-success"> Book title </th>
+						<th class="table-success bg-success"> Author </th>
+						<th class="table-success bg-success"> ISBN </th>
+						<th class="table-success bg-success"> Quantity </th>
+						<th class="table-success bg-success"> Available </th>
+						<th class="table-success bg-success"> Action </th>
+					</tr>
+				</thead>
+				<tr th:each="b,i : ${books}" data-bs-toggle="modal" th:data-bs-target="'#issued'+${b.bookId}">
+					<td class="table-success" th:text="${i.index + 1}"></td>
+					<td class="table-success" th:text="${b.bookTitle}"></td>
+					<td class="table-success" th:text="${b.author}"></td>
+					<td class="table-success" th:text="${b.isbn}"></td>
+					<td class="table-success" th:text="${b.quantity}"></td>
+					<td class="table-success" th:text="${b.available}"></td>
+					<td class="table-success action-cell-unclickable">
+						<button class="btn btn-outline-primary" data-bs-toggle="modal"
+							th:data-bs-target="'#exampleModal'+${b.bookId}">
+							<i class="bi bi-pen-fill"></i>
+						</button>
+						<button class="btn btn-outline-danger" th:onclick="deleteRecord([[${b.bookId}]])">
+							<i class="bi bi-trash-fill"></i>
+						</button>
+					</td>
+				</tr>
+			</table>
+			<div class="card">
+				<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+					<i class="bi bi-plus-circle-fill"></i> ADD BOOK
+				</button>
+			</div>
+		</div>
+
+		<th:block th:each="b,i : ${books}">
+			<!--modal for editing books-->
+			<div class="modal fade" th:id="'exampleModal'+${b.bookId}" tabindex="-1" aria-labelledby="exampleModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header bg-success">
+							<h1 class="modal-title fs-5" id="exampleModalLabel"
+								th:text="'Edit details of '+${b.bookTitle}"></h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body text-dark">
+							<div class="container">
+								<h2>Edit Book</h2>
+
+								<form method="post" action="/update-book" th:object="${book}">
+									<!-- Hidden input for the book id -->
+									<input name="bookId" type="hidden" th:value="${b.bookId}" />
+
+									<div class="form-group">
+										<label for="title">Book Title:</label>
+										<input type="text" name="bookTitle" class="form-control" id="title"
+											th:value="${b.bookTitle}" required>
+									</div>
+
+									<div class="form-group">
+										<label for="author">Author:</label>
+										<input type="text" name="author" class="form-control" id="author"
+											th:value="${b.author}" required>
+									</div>
+
+									<div class="form-group">
+										<label for="isbn">ISBN:</label>
+										<input type="text" name="isbn" class="form-control" id="isbn"
+											th:value="${b.isbn}" required>
+									</div>
+
+									<div class="form-group">
+										<label for="quantity">Quantity:</label>
+										<input type="number" name="quantity" class="form-control" id="quantity"
+											th:value="${b.quantity}" required>
+									</div>
+
+									<div class="form-group">
+										<label for="available">Available:</label>
+										<input type="number" name="available" class="form-control" id="available"
+											th:value="${b.available}" required>
+									</div>
+
+									<button type="submit" class="btn btn-primary mt-2">Update Book</button>
+								</form>
+							</div>
+						</div>
+						<div class="modal-footer bg-success">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Modal for reviewing issued books-->
+			<div class="modal fade" th:id="'issued'+${b.bookId}" tabindex="-1" aria-labelledby="exampleModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog modal-xl">
+					<div class="modal-content">
+						<div class="modal-header bg-success">
+							<h1 class="modal-title fs-5" id="exampleModalLabel" th:text="${b.bookTitle}"></h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body text-dark">
+							<table class="table table-success table-striped">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Book Title</th>
+										<th scope="col">Issue Date</th>
+										<th scope="col">Return Date</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="i : ${issues}" th:if="${i.books.bookId == b.bookId}">
+										<td th:text="${i.user.name}"></td>
+										<td th:text="${i.books.bookTitle}"></td>
+										<td th:text="${i.issueDate}"></td>
+										<td th:text="${i.returnDate}"></td>
+										<td>
+											<button class="btn btn-warning"
+												th:onclick="deleteRecordIssue([[${i.issueId}]],[[${i.books.bookTitle}]],[[${i.user.name}]])">
+												<i class="bi bi-caret-left-square"></i>
+												Returned
+											</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="modal-footer bg-success">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</th:block>
+
+		<!-- Modal for adding books-->
+		<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header bg-success">
+						<h1 class="modal-title fs-5" id="exampleModalLabel">Add Book</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body text-dark">
+						<div class="container">
+							<div class="container">
+								<form novalidate th:action="@{/process-add-book}" method="post" th:object="${book}">
+									<div class="form-group">
+										<label for="bookTitle">Book Title:</label>
+										<input type="text" class="form-control" name="bookTitle"
+											th:classappend="${#fields.hasErrors('bookTitle')?'is-invalid':''}"
+											id="bookTitle" placeholder="Enter book title" th:value="${book.bookTitle}"
+											required />
+									</div>
+									<div class="invalid-feedback" th:each="e : ${#fields.errors('bookTitle')}"
+										th:text="${e}">
+									</div>
+									<div class="form-group">
+										<label for="author">Author:</label>
+										<input type="text" class="form-control" name="author"
+											th:classappend="${#fields.hasErrors('author')?'is-invalid':''}" id="author"
+											placeholder="Enter author" th:value="${book.author}" required>
+									</div>
+									<div class="invalid-feedback" th:each="e : ${#fields.errors('author')}"
+										th:text="${e}">
+									</div>
+									<div class="form-group">
+										<label for="isbn">ISBN:</label>
+										<input type="text" class="form-control" name="isbn"
+											th:classappend="${#fields.hasErrors('isbn')?'is-invalid':''}" id="isbn"
+											placeholder="Enter ISBN" th:value="${book.isbn}" required>
+									</div>
+									<div class="invalid-feedback" th:each="e : ${#fields.errors('isbn')}"
+										th:text="${e}">
+									</div>
+									<div class="form-group">
+										<label for="isbn">Quantity:</label>
+										<input type="number" class="form-control" name="quantity"
+											th:classappend="${#fields.hasErrors('quantity')?'is-invalid':''}"
+											id="quantity" placeholder="Enter quantity" th:value="${book.quantity}"
+											required>
+									</div>
+									<div class="invalid-feedback" th:each="e : ${#fields.errors('quantity')}"
+										th:text="${e}">
+									</div>
+									<div class="form-group">
+										<label for="isbn">Available:</label>
+										<input type="number" class="form-control" name="available"
+											th:classappend="${#fields.hasErrors('available')?'is-invalid':''}"
+											id="available" placeholder="Enter available" th:value="${book.available}"
+											required>
+									</div>
+									<div class="invalid-feedback" th:each="e : ${#fields.errors('available')}"
+										th:text="${e}">
+									</div>
+									<button type="submit" class="btn btn-primary mt-2"><i
+											class="bi bi-plus-circle-fill"></i> Add
+										Book</button>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer bg-success">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

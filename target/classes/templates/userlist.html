@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" th:replace="base::layout(~{::section})">
+
+<head>
+	<meta charset="UTF-8">
+	<title>home page</title>
+
+</head>
+
+<body>
+	<section>
+		<div class="container mt-3 mb-3 p-2">
+
+			<table class="table table-dark table-hover search-result-user" id="search-result-user">
+				<!--dynamic result-->
+			</table>
+			<table class="table table-dark table-hover" id="actual-user">
+
+				<div th:if="${session.alert}" th:classappend="${session.alert.type}" class="alert alert-dismissible"
+					role="alert">
+					<strong class="text-center" th:text="${session.alert.content}"></strong>
+					<th:block th:text="${@sessionHelper.removeAlertFromSession()}"></th:block>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+					</button>
+				</div>
+
+				<thead class='thead-light'>
+					<tr>
+						<th class="table-success bg-success"> Sr. No. </th>
+						<th class="table-success bg-success"> Name </th>
+						<th class="table-success bg-success"> Phone Number </th>
+						<th class="table-success bg-success"> Email </th>
+						<th class="table-success bg-success"> Subscription Last Date </th>
+						<th class="table-success bg-success"> Action </th>
+					</tr>
+				</thead>
+				<tr th:each="u,i : ${users}" data-bs-toggle="modal" th:data-bs-target="'#issued'+${u.userId}">
+					<td class="table-success" th:text="${i.index + 1}"></td>
+					<td class="table-success" th:text="${u.name}"></td>
+					<td class="table-success" th:text="${u.phoneNumber}"></td>
+					<td class="table-success" th:text="${u.email}"></td>
+					<td class="table-success" th:text="${u.subscribtionValidation}"></td>
+					<td class="table-success action-cell-unclickable">
+						<button class="btn btn-outline-primary" data-bs-toggle="modal"
+							th:data-bs-target="'#exampleModal'+${u.userId}">
+							<i class="bi bi-pen-fill"></i>
+						</button>
+						<button class="btn btn-outline-danger" th:onclick="deleteRecordUser([[${u.userId}]])">
+							<i class="bi bi-trash-fill"></i>
+						</button>
+					</td>
+				</tr>
+			</table>
+			<th:block th:each="u,i : ${users}">
+				<!--modal for editing user-->
+				<div class="modal fade" th:id="'exampleModal'+${u.userId}" tabindex="-1"
+					aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header bg-success">
+								<h1 class="modal-title fs-5" id="exampleModalLabel"
+									th:text="'Edit details of '+${u.name}"></h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body text-dark">
+								<div class="container">
+									<h2>Edit User</h2>
+
+									<form method="post" action="/update-user" th:object="${user}">
+										<!-- Hidden input for the userId -->
+										<input name="userId" type="hidden" th:value="${u.userId}" />
+
+										<div class="form-group">
+											<label for="name">Name:</label>
+											<input type="text" name="name" class="form-control" id="name"
+												th:value="${u.name}" required>
+										</div>
+
+										<div class="form-group">
+											<label for="phoneNumber">Phone number:</label>
+											<input type="text" name="phoneNumber" class="form-control" id="phoneNumber"
+												th:value="${u.phoneNumber}" required>
+										</div>
+
+										<div class="form-group">
+											<label for="email">Email:</label>
+											<input type="email" name="phoneNumber" class="form-control" id="phoneNumber"
+												th:value="${u.phoneNumber}" required>
+										</div>
+
+										<div class="form-group">
+											<label for="subscribtionValidation">Subscription last date:</label>
+											<input type="date" name="subscribtionValidation" class="form-control"
+												id="subscribtionValidation" th:value="${u.subscribtionValidation}"
+												required>
+										</div>
+
+										<button type="submit" class="btn btn-primary mt-2">Update user</button>
+									</form>
+								</div>
+							</div>
+							<div class="modal-footer bg-success">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Modal for reviewing issued books-->
+				<div class="modal fade" th:id="'issued'+${u.userId}" tabindex="-1" aria-labelledby="exampleModalLabel"
+					aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header bg-success">
+								<h1 class="modal-title fs-5" id="exampleModalLabel" th:text="${u.name}"></h1>
+								<small class="modal-title" id="exampleModalLabel"
+									th:text="'('+${u.subscribtionValidation}+')'"></small>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body bg-success-subtle text-dark">
+								<div class="container">
+									<form name="issue-book" th:action="@{/process-issue-book}" method="post">
+										<!-- Hidden input for the user id -->
+										<input name="userId" type="hidden" th:value="${u.userId}" />
+										<div class="mb-3">
+											<label for="books" class="form-label">Books to be issued:</label>
+											<div class="mb-3">
+												<input type="text" name="books1" id="books1" list="myOptions"
+													class="form-control" placeholder="Enter book id">
+											</div>
+											<div class="mb-3">
+												<input type="text" name="books2" id="books2" list="myOptions"
+													class="form-control" placeholder="Enter book id">
+											</div>
+											<div class="mb-3">
+												<input type="text" name="books3" id="books3" list="myOptions"
+													class="form-control" placeholder="Enter book id">
+											</div>
+											<datalist id="myOptions">
+												<option th:each="b,i : ${books}" th:if="${b.available>0}"
+													th:value="${b.bookId}" th:label="${b.bookTitle}">
+											</datalist>
+										</div>
+										<button type="submit" class="btn btn-primary">Submit</button>
+									</form>
+								</div>
+							</div>
+							<div class="modal-footer bg-success">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</th:block>
+		</div>
+	</section>
+</body>
+
+</html>
